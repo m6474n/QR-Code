@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "797626748980",
+    "project_id": "map-fb337",
+    "storage_bucket": "map-fb337.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797626748980:android:1cf3d33077dbf486a3ba61",
+        "android_client_info": {
+          "package_name": "com.example.google_map"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797626748980-i7ut73petc33vi86ui93so00tuji513b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.google_map",
+            "certificate_hash": "b1106ac260d6e1fe2baaff2c85fe1f3f926ff6a5"
+          }
+        },
+        {
+          "client_id": "797626748980-qe50p26t9p74h7ncjc7karmj9qmv829h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFzpOTug5h8_GWselSSDTwAWdMEOJ6JQw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797626748980-qe50p26t9p74h7ncjc7karmj9qmv829h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "797626748980-b6ubfbh63fq2t5ct35ee9qtu58dll1fq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.googleMap"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797626748980:android:71efc7c995c0b733a3ba61",
+        "android_client_info": {
+          "package_name": "com.example.qr_code"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797626748980-qe50p26t9p74h7ncjc7karmj9qmv829h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFzpOTug5h8_GWselSSDTwAWdMEOJ6JQw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797626748980-qe50p26t9p74h7ncjc7karmj9qmv829h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "797626748980-b6ubfbh63fq2t5ct35ee9qtu58dll1fq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.googleMap"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
