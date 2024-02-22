@@ -49,6 +49,8 @@ dependencies:
   qr_code_scanner: ^1.0.1
   flutter_barcode_scanner: ^2.0.0
   network_info_plus: ^4.1.0+1
+  flutter_local_notifications: ^16.3.2
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:

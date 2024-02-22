@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,6 +24,7 @@ class HomeController extends GetxController {
   final userEmail = FirebaseAuth.instance.currentUser!.email;
   final nameController = TextEditingController();
   final dbRef =  FirebaseFirestore.instance.collection("DeviceTokens");
+  final user = FirebaseAuth.instance.currentUser;
   final networkInfo = NetworkInfo();
   String? myToken, myWifi;
   final DeviceStream = FirebaseFirestore.instance
@@ -62,6 +63,11 @@ class HomeController extends GetxController {
                       showBottomSheet(snapshot.data!.docs[index].id);
                     },
                     title: Text(snapshot.data!.docs[index]['name']),
+                    trailing: GestureDetector(
+                        onTap: (){
+                          sendNotification(snapshot.data!.docs[index]['token']);
+                        },
+                        child: Icon(Icons.notifications_active)),
                   ),
                 ),
               );
@@ -290,6 +296,40 @@ updateName(String id){
 //QrScanning
   bool isDeviceFound = false;
 
+
+  ///send notificaion
+  sendNotification(String token) async {
+
+    service.getDeviceToken().then((value)async{
+
+
+        var data = {
+          'to': token,
+          'priority': 'high',
+          'notification': {
+            'title':"New Notification!",
+            'body':  "from: ${user!.displayName.toString()}",
+          }
+
+        };
+        await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            body: jsonEncode(data),
+            headers: {
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization':
+              'key=AAAAubZCUDQ:APA91bF-91J8-5pvykjOao6nAC-MeBLSMDV5BwCNMePMGsTVG-D3BQaZvabBVVzIpJc-NrFjvtEhfE8BG3V_bGzKcW5ZYTZTAkb_Y8OHDRQte9LcV6rkS1l_0sEJyk7gOGsSNoj77MMt'
+            });
+
+
+    });
+
+
+  }
+
+
+
+
+
   @override
   void onClose() {
     // TODO: implement onClose
@@ -300,6 +340,8 @@ updateName(String id){
   void onInit() {
     // TODO: implement onInit
     generateData();
+    service.firebaseInit();
+    service.requestNotification();
     super.onInit();
   }
 }
