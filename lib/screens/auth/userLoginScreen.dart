@@ -9,8 +9,8 @@ import 'package:qr_code/controller/AuthController.dart';
 import 'package:qr_code/screens/admin/RegisterScreen.dart';
 import 'package:qr_code/screens/forgetPass.dart';
 
-class TestScreen extends StatelessWidget {
-  const TestScreen({super.key});
+class UserLogin extends StatelessWidget {
+  const UserLogin({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class TestScreen extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-controller.login();
+                            controller.login();
                           },
                           child: Container(
                             height: 60,

@@ -9,6 +9,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_code/services/NotificationServices.dart';
+import 'package:qr_code/services/auth_services.dart';
 import 'package:sliding_switch/sliding_switch.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,23 +17,49 @@ class ButtonController extends GetxController {
   final user = FirebaseAuth.instance.currentUser;
   final userRef = FirebaseFirestore.instance.collection("users");
   final remindersRef = FirebaseFirestore.instance.collection("Reminders");
-  List ringerList = [];
+  List ringerList =[];
   String?  userName;
   Stream? userStream;
   RxString selectedTime = "0".obs;
+
+  void fetchData() {
+    FirebaseFirestore.instance  .collection("users")
+        .doc(AuthManager().userId)
+        .collection("Assigned Devices").snapshots().listen(
+          (QuerySnapshot querySnapshot) {
+        // Clear the existing data
+        ringerList.clear();
+
+        // Add new data to the RxList
+        querySnapshot.docs.forEach((element) {
+          ringerList.add(element.id);
+        });
+
+        // Update the UI
+        update();
+      },
+      onError: (error) {
+        // Handle errors if any
+        print('Error fetching data: $error');
+      },
+    );
+  }
+
+
 getUserData()async{
-  await userRef.doc(user!.uid).get().then((value){
+  await userRef.doc(AuthManager().userId).get().then((value){
     userName = value['name'];
   });
   update();
 }
   Future<List<String>> getAssignedDeviceIds() async {
     List<String> ids = [];
+    print(AuthManager().userId);
 
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection("users")
-          .doc(user!.uid)
+          .doc(AuthManager().userId)
           .collection("Assigned Devices")
           .get();
 
@@ -80,13 +107,14 @@ getUserData()async{
                         leading: CircleAvatar(
                             radius: 8,
                             backgroundColor:
-                                snapshot.data?.docs[index]['availability'] ? Colors.green : Colors.grey,
+                                snapshot.data!.docs[index]['availability'] ? Colors.green : Colors.grey,
                           ),
                             onLongPress: (){
-                            bottomSheet(user!.uid, snapshot.data!.docs[index]['deviceToken'], snapshot.data!.docs[index]['id'], snapshot.data!.docs[index]['name']);
+                            bottomSheet(AuthManager().userId!, snapshot.data!.docs[index]['deviceToken'], snapshot.data!.docs[index]['id'], snapshot.data!.docs[index]['name']);
                             },
                         onTap: () {
-                          snapshot.data?.docs[index]['availability'] ? sendNotification(snapshot.data?.docs[index]['deviceToken']):bottomSheet(user!.uid, snapshot.data!.docs[index]['deviceToken'], snapshot.data!.docs[index]['id'], snapshot.data!.docs[index]['name']);
+
+                          snapshot.data!.docs[index]['availability'] ? sendNotification(snapshot.data?.docs[index]['deviceToken']):bottomSheet(AuthManager().userId!, snapshot.data!.docs[index]['deviceToken'], snapshot.data!.docs[index]['id'], snapshot.data!.docs[index]['name']);
 
                         },
                         title: Text(snapshot.data!.docs[index]['name']),
@@ -98,7 +126,7 @@ getUserData()async{
           });
     } else {
       return Center(
-        child: CircularProgressIndicator(),
+        child: Text("No Device Found"),
       );
     }
   }
@@ -108,6 +136,7 @@ getUserData()async{
 
   ///send notificaion
   sendNotification(String token) async {
+    EasyLoading.showToast("Rings!");
     print("Notification Sent");
       var data = {
         'to': token,
@@ -180,8 +209,8 @@ final reminderController = TextEditingController();
                     decoration: BoxDecoration(
                         color: Colors.deepPurpleAccent,
                         borderRadius: BorderRadius.circular(12)),
-                    child: Center(
-                        child: selectedTime.value == "0"? Text("Pick Time"): Obx(() => Text(selectedTime.value))),
+                    child:Obx(() => Center(
+                        child: selectedTime.value == "0"? Text("Pick Time"):  Text(selectedTime.value)),),
                   )),
               SizedBox(
                 height: 8,
@@ -256,11 +285,13 @@ final reminderController = TextEditingController();
   @override
   void onInit() {
     // TODO: implement onInit
-    getAssignedDeviceIds().then((value) {
-      ringerList = value;
-      update();
-      print(ringerList);
-    });
+
+    fetchData();
+    // getAssignedDeviceIds().then((value) {
+    //   ringerList = value;
+    //   update();
+    //   print(ringerList);
+    // });
 getUserData();
     super.onInit();
   }

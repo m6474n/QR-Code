@@ -13,7 +13,7 @@
 
 
     <application
-        android:label="qr_code"
+        android:label="Ringer App"
         android:name="${applicationName}"
 
         android:icon="@mipmap/ic_launcher">

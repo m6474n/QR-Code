@@ -9,24 +9,24 @@ import 'package:get/get.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:qr_code/controller/HomeController.dart';
 import 'package:qr_code/services/NotificationServices.dart';
+import 'package:qr_code/services/auth_services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sliding_switch/sliding_switch.dart';
 
 class RingerController extends GetxController {
   NotificationService service = NotificationService();
   final networkInfo = NetworkInfo();
-  final auth = FirebaseAuth.instance.currentUser!;
   final userRef = FirebaseFirestore.instance.collection("users");
   String? myToken, myWifi;
   String? jsonData;
-  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final uid = AuthManager().userId;
   bool btnValue = false;
   final remindersRef = FirebaseFirestore.instance.collection("Reminders");
 
   String userName = "Loading...";
 
   getData() async {
-    await userRef.doc(auth.uid).get().then((value) {
+    await userRef.doc(AuthManager().userId).get().then((value) {
       btnValue = value["availability"];
       userName = value["name"];
       update();
@@ -113,7 +113,7 @@ class RingerController extends GetxController {
     });
     FirebaseFirestore.instance
         .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(AuthManager().userId)
         .update({
           ""
               'deviceToken': myToken,
@@ -127,10 +127,10 @@ class RingerController extends GetxController {
   }
 
   getReminders() {
-    print(auth.uid);
+    print(AuthManager().userId);
     return Flexible(
       child: StreamBuilder(
-        stream: remindersRef.where('id', isEqualTo: auth.uid).snapshots(),
+        stream: remindersRef.where('id', isEqualTo: AuthManager().userId).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -195,7 +195,7 @@ class RingerController extends GetxController {
             value: btnValue,
             onChanged: (bool newVal) {
               btnValue = newVal;
-              userRef.doc(auth.uid).update({"availability": btnValue});
+              userRef.doc(AuthManager().userId).update({"availability": btnValue});
               update();
             }),
       ],
@@ -216,7 +216,7 @@ class RingerController extends GetxController {
     service.getDeviceToken().then((value) {
       FirebaseFirestore.instance
           .collection("users")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .doc(AuthManager().userId)
           .update({
         "deviceToken": value,
       });
@@ -225,13 +225,12 @@ class RingerController extends GetxController {
     getWifiInfo().then((value) {
       FirebaseFirestore.instance
           .collection("users")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .doc(AuthManager().userId)
           .update({"wifi_info": value});
       print(value);
     });
     getData();
     service.firebaseInit();
-
     // updateRingerProfile();
     // TODO: implement onInit
     super.onInit();

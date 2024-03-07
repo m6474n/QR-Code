@@ -64,15 +64,7 @@ class LoginScreen extends StatelessWidget {
                           obscure: true,
                           controller: controller.passController,
                           prefixIcon: Icons.lock),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            Get.to(ForgetPassword());
-                          },
-                          child: Text('Forget Password?'),
-                        ),
-                      ),
+                    SizedBox(height: 30,),
                       GestureDetector(
                         onTap: () {
                           controller.loginWithEmail(

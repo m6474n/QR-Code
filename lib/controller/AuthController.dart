@@ -16,6 +16,7 @@ import 'package:qr_code/screens/Home.dart';
 import 'package:qr_code/screens/auth/LoginScreen.dart';
 import 'package:qr_code/screens/ringer/RingerScreen.dart';
 import 'package:qr_code/services/NotificationServices.dart';
+import 'package:qr_code/services/auth_services.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';
 
 class AuthController extends GetxController {
@@ -25,6 +26,7 @@ class AuthController extends GetxController {
   // final Stream profile  = FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).snapshots();
   final emailController = TextEditingController();
   final passController = TextEditingController();
+
   final phoneController = TextEditingController();
   final nameController = TextEditingController();
 
@@ -60,33 +62,48 @@ class AuthController extends GetxController {
     update();
   }
 
-  loginWithEmail(String email, String password) {
+  loginWithEmail(String email, String password) async{
     EasyLoading.show(status: "Logging in to your account, Please wait...", );
-    auth
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((value)async {
+try{
+  await FirebaseFirestore.instance.collection("users").where('email',isEqualTo: emailController.text).get().then((value){
+    if(value.docs[0]['role'] == "Admin"){
+      auth.signInWithEmailAndPassword(email: email, password: password).then((value)async{
         emailController.clear();
-      passController.clear();
-      EasyLoading.dismiss();
-      await   FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).get().then((value){
-        if(value["role"] == "Admin"){
-          Get.snackbar('Login', 'Successfully',);
-          Get.to(AdminScreen());
-        }else if(value["role"] == "Button"){
-          Get.snackbar('Login', 'Successfully',);
-          Get.to(ButtonScreen());
-        }else{
-          updateRingerProfile(auth.currentUser!.uid);
-          Get.snackbar('Login', 'Successfully',);
-          Get.to(RingerScreen());
-        }
-
+        passController.clear();
+        EasyLoading.dismiss();
+        Get.snackbar('Login', 'Successfully',);
+        Get.to(AdminScreen());
       });
+    }else{
+      if(value.docs[0]['password'] == passController.text){
+        AuthManager().login(value.docs[0]['id'], value.docs[0]['name'], value.docs[0]['email'], value.docs[0]['password'], value.docs[0]['role']).then((value){
+          if(AuthManager().userRole == "Button"){
+            emailController.clear();
+            passController.clear();
+            Get.to(ButtonScreen());
+            EasyLoading.dismiss();
+            Get.snackbar('Login', 'Successfully',);
+          }else{
+            emailController.clear();
+            passController.clear();
+            Get.snackbar('Login', 'Successfully',);
+            Get.to(RingerScreen());
+            EasyLoading.dismiss();
+          }
+        });
+      }else{
+        EasyLoading.showToast("Password incorrect!");
+      }
+    }
 
-    }).onError((error, stackTrace) {
-      EasyLoading.dismiss();
-      Get.snackbar('Error', error.toString(), backgroundColor: Colors.red);
-    });
+
+  });
+
+}catch(e){
+  EasyLoading.showToast(e.toString());
+}
+
+
     update();
   }
   forgetPassword(){
